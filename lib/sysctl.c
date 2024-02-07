@@ -7,6 +7,7 @@
 #include <caml/alloc.h>
 #include <caml/memory.h>
 #include <caml/fail.h>
+#include <caml/threads.h>
 
 #define ctlval_Int_tag		0
 #define ctlval_String_tag	1
@@ -32,8 +33,10 @@ caml_sysctl_name2mib(value name)
 	size_t size;
 	int err;
 
+	caml_release_runtime_system();
 	size = nitems(mib);
 	err = sysctlnametomib(String_val(name), mib, &size);
+	caml_acquire_runtime_system();
 	if (err) {
 		caml_failwith(strerror(errno));
 	}
@@ -71,15 +74,18 @@ caml_sysctl_get(value mib)
 		qoid[i + 2] = Int_val(Field(mib, i));
 	}
 
+	caml_release_runtime_system();
 	len = sizeof(buf);
 	err = sysctl(qoid, size + 2, buf, &len, NULL, 0);
 	if (err) {
+		caml_acquire_runtime_system();
 		caml_failwith(strerror(errno));
 	}
 
 	kind = *(u_int *)buf;
 	ctltype = kind & CTLTYPE;
 	if (ctltype == CTLTYPE_NODE) {
+		caml_acquire_runtime_system();
 		res = Val_int(0); /* first constant constructor */
 		CAMLreturn (res);
 	}
@@ -87,20 +93,24 @@ caml_sysctl_get(value mib)
 	len = 0;
 	err = sysctl(qoid + 2, size, NULL, &len, NULL, 0);
 	if (err) {
+		caml_acquire_runtime_system();
 		caml_failwith(strerror(errno));
 	}
 	len += len; /* double buffer size to be safe */
 	p = malloc(len);
 	if (p == NULL) {
+		caml_acquire_runtime_system();
 		caml_failwith(strerror(errno));
 	}
 	err = sysctl(qoid + 2, size, p, &len, NULL, 0);
 	if (err) {
 		int e = errno;
 		free(p);
+		caml_acquire_runtime_system();
 		caml_failwith(strerror(e));
 	}
 
+	caml_acquire_runtime_system();
 	switch (ctltype) {
 	case CTLTYPE_INT:
 		res = caml_alloc(1, ctlval_Int_tag);
@@ -334,12 +344,15 @@ caml_sysctl_set(value mib, value val)
 		caml_failwith("Unhandled ctlval tag");
 	}
 	
+	caml_release_runtime_system();
 	err = sysctl(oid, size, NULL, NULL, p, len);
 	if (err) {
 		int e = errno;
 		free(p);
+		caml_acquire_runtime_system();
 		caml_failwith(strerror(e));
 	}
 	free(p);
+	caml_acquire_runtime_system();
 	CAMLreturn (Val_unit);
 }
