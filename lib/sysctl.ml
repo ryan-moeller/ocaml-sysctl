@@ -16,6 +16,8 @@ type ctlval =
 | U32 of int32
 
 external nametomib: string -> int array = "caml_sysctl_nametomib"
+external format: int array -> int * string = "caml_sysctl_format"
+external description: int array -> string = "caml_sysctl_description"
 
 external get: int array -> ctlval = "caml_sysctl_get"
 external set: int array -> ctlval -> unit = "caml_sysctl_set"

@@ -49,6 +49,86 @@ caml_sysctl_nametomib(value name)
 }
 
 CAMLprim value
+caml_sysctl_format(value mib)
+{
+	CAMLparam1 (mib);
+	CAMLlocal1 (res);
+	int qoid[CTL_MAXNAME+2];
+	u_char buf[BUFSIZ];
+	const char *fmt;
+	mlsize_t size;
+	size_t len;
+	u_int kind;
+	int err;
+
+	size = Wosize_val(mib);
+	if (size > CTL_MAXNAME) {
+		caml_invalid_argument("Invalid mib: too long");
+	}
+
+	qoid[0] = CTL_SYSCTL;
+	qoid[1] = CTL_SYSCTL_OIDFMT;
+	for (mlsize_t i = 0; i < size; i++) {
+		qoid[i + 2] = Int_val(Field(mib, i));
+	}
+
+	caml_release_runtime_system();
+	len = sizeof buf;
+	err = sysctl(qoid, size + 2, buf, &len, NULL, 0);
+	if (err) {
+		err = errno;
+		caml_acquire_runtime_system();
+		caml_failwith(strerror(err));
+	}
+
+	kind = *(u_int *)buf;
+	fmt = (char *)(buf + sizeof(u_int));
+
+	caml_acquire_runtime_system();
+	res = caml_alloc(2, 0);
+	Store_field(res, 0, Val_int(kind));
+	Store_field(res, 1, caml_copy_string(fmt));
+	CAMLreturn (res);
+}
+
+CAMLprim value
+caml_sysctl_description(value mib)
+{
+	CAMLparam1 (mib);
+	int qoid[CTL_MAXNAME+2];
+	u_char buf[BUFSIZ];
+	const char *descr;
+	mlsize_t size;
+	size_t len;
+	int err;
+
+	size = Wosize_val(mib);
+	if (size > CTL_MAXNAME) {
+		caml_invalid_argument("Invalid mib: too long");
+	}
+
+	qoid[0] = CTL_SYSCTL;
+	qoid[1] = CTL_SYSCTL_OIDDESCR;
+	for (mlsize_t i = 0; i < size; i++) {
+		qoid[i + 2] = Int_val(Field(mib, i));
+	}
+
+	caml_release_runtime_system();
+	len = sizeof buf;
+	err = sysctl(qoid, size + 2, buf, &len, NULL, 0);
+	if (err) {
+		err = errno;
+		caml_acquire_runtime_system();
+		caml_failwith(strerror(err));
+	}
+
+	descr = (char *)buf;
+
+	caml_acquire_runtime_system();
+	CAMLreturn (caml_copy_string(descr));
+}
+
+CAMLprim value
 caml_sysctl_get(value mib)
 {
 	CAMLparam1 (mib);

@@ -14,4 +14,8 @@ Sysctl.String "[fastest] scalar superscalar superscalar4 sse2 ssse3 avx2 "
 Sysctl.String "fastest scalar superscalar superscalar4 sse2 ssse3 [avx2] "
 # Sysctl.setbyname "vfs.zfs.fletcher_4_impl" (Sysctl.String "fastest");;
 - : unit = ()
+# Sysctl.format @@ Sysctl.nametomib "vfs.zfs.abd_scatter_min_size";;
+- : int * string = (3222016008, "LU")
+# Sysctl.description @@ Sysctl.nametomib "vfs.zfs.blake3_impl";;
+- : string = "Select BLAKE3 implementation."
 ```
