@@ -15,15 +15,15 @@ type ctlval =
 | S32 of int32
 | U32 of int32
 
-external name2mib: string -> int array = "caml_sysctl_name2mib"
+external nametomib: string -> int array = "caml_sysctl_nametomib"
 
 external get: int array -> ctlval = "caml_sysctl_get"
 external set: int array -> ctlval -> unit = "caml_sysctl_set"
 
 let getbyname name =
-  let mib = name2mib name in
+  let mib = nametomib name in
   get mib
 
 let setbyname name value =
-  let mib = name2mib name in
+  let mib = nametomib name in
   set mib value

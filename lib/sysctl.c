@@ -24,7 +24,7 @@
 #define ctlval_U32_tag		13
 
 CAMLprim value
-caml_sysctl_name2mib(value name)
+caml_sysctl_nametomib(value name)
 {
 	CAMLparam1 (name);
 	CAMLlocal1 (res);

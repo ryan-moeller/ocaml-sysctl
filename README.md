@@ -2,7 +2,7 @@ Usage
 -----
 
 ```ocaml
-# let mib = Sysctl.name2mib "vfs.zfs.fletcher_4_impl";;
+# let mib = Sysctl.nametomib "vfs.zfs.fletcher_4_impl";;
 val mib : int array = [|3; 222; 2147481069|]
 # Sysctl.get mib;;
 - : Sysctl.ctlval =
