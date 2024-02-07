@@ -74,11 +74,12 @@ caml_sysctl_get(value mib)
 	}
 
 	caml_release_runtime_system();
-	len = sizeof(buf);
+	len = sizeof buf;
 	err = sysctl(qoid, size + 2, buf, &len, NULL, 0);
 	if (err) {
+		err = errno;
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(errno));
+		caml_failwith(strerror(err));
 	}
 
 	kind = *(u_int *)buf;
@@ -92,21 +93,23 @@ caml_sysctl_get(value mib)
 	len = 0;
 	err = sysctl(qoid + 2, size, NULL, &len, NULL, 0);
 	if (err) {
+		err = errno;
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(errno));
+		caml_failwith(strerror(err));
 	}
 	len += len; /* double buffer size to be safe */
 	p = malloc(len);
 	if (p == NULL) {
+		err = errno;
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(errno));
+		caml_failwith(strerror(err));
 	}
 	err = sysctl(qoid + 2, size, p, &len, NULL, 0);
 	if (err) {
-		int e = errno;
+		err = errno;
 		free(p);
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(e));
+		caml_failwith(strerror(err));
 	}
 
 	caml_acquire_runtime_system();
@@ -346,10 +349,10 @@ caml_sysctl_set(value mib, value val)
 	caml_release_runtime_system();
 	err = sysctl(oid, size, NULL, NULL, p, len);
 	if (err) {
-		int e = errno;
+		err = errno;
 		free(p);
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(e));
+		caml_failwith(strerror(err));
 	}
 	free(p);
 	caml_acquire_runtime_system();
