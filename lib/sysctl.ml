@@ -15,6 +15,36 @@ type ctlval =
 | S32 of int32
 | U32 of int32
 
+let string_of_ctlval = function
+| Node -> "<node>"
+| Opaque _ -> "<bytes>"
+| String s -> s
+| Int x | Uint x | Long x | Ulong x -> string_of_int x
+| S8 x | U8 x | S16 x | U16 x | S32 x | U32 x -> Int32.to_string x
+| S64 x | U64 x -> Int64.to_string x
+
+(* Helpers for dealing with format information *)
+let ctltype (kind, _fmt) = kind land 0xf
+let is_rd (kind, _fmt) = kind land 0x80000000 != 0
+let is_wr (kind, _fmt) = kind land 0x40000000 != 0
+let is_rw kf = is_rd kf && is_wr kf
+let is_dormant (kind, _fmt) = kind land 0x20000000 != 0
+let is_anybody (kind, _fmt) = kind land 0x10000000 != 0
+let is_secure (kind, _fmt) = kind land 0x08000000 != 0
+let is_prison (kind, _fmt) = kind land 0x04000000 != 0
+let is_dyn (kind, _fmt) = kind land 0x02000000 != 0
+let is_skip (kind, _fmt) = kind land 0x01000000 != 0
+let securelevel (kind, _fmt) = (kind lsr 20) land 0xf
+let is_tunable (kind, _fmt) = kind land 0x00080000 != 0
+let is_mpsafe (kind, _fmt) = kind land 0x00040000 != 0
+let is_vnet (kind, _fmt) = kind land 0x00020000 != 0
+let is_dying (kind, _fmt) = kind land 0x00010000 != 0
+let is_caprd (kind, _fmt) = kind land 0x00008000 != 0
+let is_capwr (kind, _fmt) = kind land 0x00004000 != 0
+let is_caprw kf = is_caprd kf && is_capwr kf
+let is_stats (kind, _fmt) = kind land 0x00002000 != 0
+let is_nofetch (kind, _fmt) = kind land 0x00001000 != 0
+
 external nametomib: string -> int array = "caml_sysctl_nametomib"
 external next: int array -> int array option = "caml_sysctl_next"
 external next_noskip: int array -> int array option = "caml_sysctl_next_noskip"
