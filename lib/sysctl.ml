@@ -36,8 +36,11 @@ let setbyname name value =
 let iter mib () =
   let prefix_match n =
     let l = Array.length mib in
-    let p = Array.sub n 0 l in
-    List.equal Int.equal (Array.to_list mib) (Array.to_list p)
+    if l < Array.length n
+    then false
+    else
+      let p = Array.sub n 0 l in
+      List.equal Int.equal (Array.to_list mib) (Array.to_list p)
   in
   let rec iter1 mib () =
     match next mib with
@@ -60,8 +63,11 @@ let all =
 let iter_noskip mib () =
   let prefix_match n =
     let l = Array.length mib in
-    let p = Array.sub n 0 l in
-    List.equal Int.equal (Array.to_list mib) (Array.to_list p)
+    if l < Array.length n
+    then false
+    else
+      let p = Array.sub n 0 l in
+      List.equal Int.equal (Array.to_list mib) (Array.to_list p)
   in
   let rec iter1 mib () =
     match next_noskip mib with
