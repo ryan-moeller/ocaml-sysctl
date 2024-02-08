@@ -16,6 +16,8 @@ type ctlval =
 | U32 of int32
 
 external nametomib: string -> int array = "caml_sysctl_nametomib"
+external next: int array -> int array = "caml_sysctl_next"
+external name: int array -> string = "caml_sysctl_name"
 external format: int array -> int * string = "caml_sysctl_format"
 external description: int array -> string = "caml_sysctl_description"
 
@@ -29,3 +31,7 @@ let getbyname name =
 let setbyname name value =
   let mib = nametomib name in
   set mib value
+
+let rec iter mib () = Seq.Cons (mib, (iter (next mib)))
+
+let all = iter [|0|]
