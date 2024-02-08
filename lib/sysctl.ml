@@ -66,7 +66,7 @@ let setbyname name value =
 let iter mib () =
   let prefix_match n =
     let l = Array.length mib in
-    if l < Array.length n
+    if l > Array.length n
     then false
     else
       let p = Array.sub n 0 l in
@@ -93,7 +93,7 @@ let all =
 let iter_noskip mib () =
   let prefix_match n =
     let l = Array.length mib in
-    if l < Array.length n
+    if l > Array.length n
     then false
     else
       let p = Array.sub n 0 l in
