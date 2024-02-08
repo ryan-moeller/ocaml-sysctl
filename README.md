@@ -18,11 +18,18 @@ Sysctl.String "fastest scalar superscalar superscalar4 sse2 ssse3 [avx2] "
 - : int * string = (3222016008, "LU")
 # Sysctl.description @@ Sysctl.nametomib "vfs.zfs.blake3_impl";;
 - : string = "Select BLAKE3 implementation."
-# Sysctl.all |> Seq.map Sysctl.name |> Seq.take 20 |> List.of_seq;;
-- : string list =
-["sysctl"; "sysctl.name"; "sysctl.next"; "sysctl.name2oid"; "sysctl.oidfmt";
- "sysctl.oiddescr"; "sysctl.oidlabel"; "sysctl.nextnoskip"; "kern.ostype";
- "kern.osrelease"; "kern.osrevision"; "kern.version"; "kern.maxvnodes";
- "kern.maxproc"; "kern.maxfiles"; "kern.argmax"; "kern.securelevel";
- "kern.hostname"; "kern.hostid"; "kern.clockrate"]
+#  Sysctl.nametomib "compat" |> Sysctl.iter |> Seq.map Sysctl.name |> Seq.iter print_endline;;
+compat
+compat.ia32.maxvmem
+compat.ia32.maxssiz
+compat.ia32.maxdsiz
+compat.linuxkpi.skb.mem_limit
+compat.linuxkpi.lkpi_pci_nseg1_fail
+compat.linuxkpi.task_struct_reserve
+compat.linuxkpi.net_ratelimit
+compat.linuxkpi.warn_dump_stack
+compat.linuxkpi.debug
+- : unit = ()
+# Sysctl.all_noskip |> Seq.length;;
+- : int = 20092
 ```

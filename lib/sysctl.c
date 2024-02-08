@@ -75,6 +75,9 @@ caml_sysctl_next(value mib)
 	if (err) {
 		err = errno;
 		caml_acquire_runtime_system();
+		if (err == ENOENT) {
+			CAMLreturn (Val_none);
+		}
 		caml_failwith(strerror(err));
 	}
 	len /= sizeof nextoid[0];
@@ -84,7 +87,49 @@ caml_sysctl_next(value mib)
 	for (mlsize_t i = 0; i < len; i++) {
 		Store_field(next, i, Val_int(nextoid[i]));
 	}
-	CAMLreturn (next);
+	CAMLreturn (caml_alloc_some(next));
+}
+
+CAMLprim value
+caml_sysctl_next_noskip(value mib)
+{
+	CAMLparam1 (mib);
+	CAMLlocal1 (next);
+	int qoid[CTL_MAXNAME+2], nextoid[CTL_MAXNAME];
+	mlsize_t size;
+	size_t len;
+	int err;
+
+	size = Wosize_val(mib);
+	if (size > CTL_MAXNAME) {
+		caml_invalid_argument("Invalid mib: too long");
+	}
+
+	qoid[0] = CTL_SYSCTL;
+	qoid[1] = CTL_SYSCTL_NEXTNOSKIP;
+	for (mlsize_t i = 0; i < size; i++) {
+		qoid[i + 2] = Int_val(Field(mib, i));
+	}
+
+	caml_release_runtime_system();
+	len = sizeof nextoid;
+	err = sysctl(qoid, size + 2, nextoid, &len, NULL, 0);
+	if (err) {
+		err = errno;
+		caml_acquire_runtime_system();
+		if (err == ENOENT) {
+			CAMLreturn (Val_none);
+		}
+		caml_failwith(strerror(err));
+	}
+	len /= sizeof nextoid[0];
+	caml_acquire_runtime_system();
+
+	next = caml_alloc(len, 0);
+	for (mlsize_t i = 0; i < len; i++) {
+		Store_field(next, i, Val_int(nextoid[i]));
+	}
+	CAMLreturn (caml_alloc_some(next));
 }
 
 CAMLprim value

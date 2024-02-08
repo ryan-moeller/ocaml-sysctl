@@ -16,7 +16,8 @@ type ctlval =
 | U32 of int32
 
 external nametomib: string -> int array = "caml_sysctl_nametomib"
-external next: int array -> int array = "caml_sysctl_next"
+external next: int array -> int array option = "caml_sysctl_next"
+external next_noskip: int array -> int array option = "caml_sysctl_next_noskip"
 external name: int array -> string = "caml_sysctl_name"
 external format: int array -> int * string = "caml_sysctl_format"
 external description: int array -> string = "caml_sysctl_description"
@@ -32,6 +33,38 @@ let setbyname name value =
   let mib = nametomib name in
   set mib value
 
-let rec iter mib () = Seq.Cons (mib, (iter (next mib)))
+let iter mib () =
+  let prefix_match n =
+    let l = Array.length mib in
+    let p = Array.sub n 0 l in
+    List.equal Int.equal (Array.to_list mib) (Array.to_list p)
+  in
+  let rec iter1 mib () =
+    match next mib with
+    | Some(nxt) ->
+        if prefix_match nxt
+        then Seq.Cons (mib, (iter1 nxt))
+        else Seq.Cons (mib, (fun () -> Seq.Nil))
+    | None -> Seq.Cons (mib, (fun () -> Seq.Nil))
+  in
+  iter1 mib ()
 
-let all = iter [|1|]
+let all = iter [||]
+
+let iter_noskip mib () =
+  let prefix_match n =
+    let l = Array.length mib in
+    let p = Array.sub n 0 l in
+    List.equal Int.equal (Array.to_list mib) (Array.to_list p)
+  in
+  let rec iter1 mib () =
+    match next_noskip mib with
+    | Some(nxt) ->
+        if prefix_match nxt
+        then Seq.Cons (mib, (iter1 nxt))
+        else Seq.Cons (mib, (fun () -> Seq.Nil))
+    | None -> Seq.Cons (mib, (fun () -> Seq.Nil))
+  in
+  iter1 mib ()
+
+let all_noskip = iter_noskip [||]
