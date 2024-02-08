@@ -20,7 +20,7 @@ external next: int array -> int array option = "caml_sysctl_next"
 external next_noskip: int array -> int array option = "caml_sysctl_next_noskip"
 external name: int array -> string = "caml_sysctl_name"
 external format: int array -> int * string = "caml_sysctl_format"
-external description: int array -> string = "caml_sysctl_description"
+external description: int array -> string option = "caml_sysctl_description"
 
 external get: int array -> ctlval = "caml_sysctl_get"
 external set: int array -> ctlval -> unit = "caml_sysctl_set"

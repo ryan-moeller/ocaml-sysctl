@@ -213,6 +213,7 @@ CAMLprim value
 caml_sysctl_description(value mib)
 {
 	CAMLparam1 (mib);
+	CAMLlocal1 (description);
 	int qoid[CTL_MAXNAME+2];
 	u_char buf[BUFSIZ];
 	const char *descr;
@@ -237,13 +238,17 @@ caml_sysctl_description(value mib)
 	if (err) {
 		err = errno;
 		caml_acquire_runtime_system();
+		if (err == ENOENT) {
+			CAMLreturn (Val_none);
+		}
 		caml_failwith(strerror(err));
 	}
 
 	descr = (char *)buf;
 
 	caml_acquire_runtime_system();
-	CAMLreturn (caml_copy_string(descr));
+	description = caml_copy_string(descr);
+	CAMLreturn (caml_alloc_some(description));
 }
 
 CAMLprim value
