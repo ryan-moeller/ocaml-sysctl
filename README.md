@@ -17,7 +17,7 @@ Sysctl.String "fastest scalar superscalar superscalar4 sse2 ssse3 [avx2] "
 # Sysctl.format @@ Sysctl.nametomib "vfs.zfs.abd_scatter_min_size";;
 - : int * string = (3222016008, "LU")
 # Sysctl.description @@ Sysctl.nametomib "vfs.zfs.blake3_impl";;
-- : string = "Select BLAKE3 implementation."
+- : string option = Some "Select BLAKE3 implementation."
 #  Sysctl.nametomib "compat" |> Sysctl.iter |> Seq.map Sysctl.name |> Seq.iter print_endline;;
 compat
 compat.ia32.maxvmem
