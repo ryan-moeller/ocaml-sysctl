@@ -1,4 +1,0 @@
-(executable
- (public_name sysctl)
- (name main)
- (libraries sysctl))

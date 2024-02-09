@@ -1,5 +1,6 @@
 (library
  (name sysctl)
+ (public_name sysctl)
  (foreign_stubs
   (language c)
   (names sysctl)))
