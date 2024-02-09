@@ -63,12 +63,12 @@ let setbyname name value =
   set mib value
 
 let iter mib () =
-  let prefix_match n =
-    let l = Array.length mib in
-    if l > Array.length n then false
+  let prefix_match nxt =
+    let len = Array.length mib in
+    if len > Array.length nxt then false
     else
-      let p = Array.sub n 0 l in
-      List.equal Int.equal (Array.to_list mib) (Array.to_list p)
+      let prefix = Array.sub nxt 0 len in
+      prefix = mib
   in
   let rec iter1 mib () =
     match next mib with
@@ -88,12 +88,12 @@ let all =
   iter1 [| 1 |]
 
 let iter_noskip mib () =
-  let prefix_match n =
-    let l = Array.length mib in
-    if l > Array.length n then false
+  let prefix_match nxt =
+    let len = Array.length mib in
+    if len > Array.length nxt then false
     else
-      let p = Array.sub n 0 l in
-      List.equal Int.equal (Array.to_list mib) (Array.to_list p)
+      let prefix = Array.sub nxt 0 len in
+      prefix = mib
   in
   let rec iter1 mib () =
     match next_noskip mib with
