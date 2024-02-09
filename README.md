@@ -18,7 +18,7 @@ Sysctl.String "fastest scalar superscalar superscalar4 sse2 ssse3 [avx2] "
 - : int * string = (3222016008, "LU")
 # Sysctl.description @@ Sysctl.nametomib "vfs.zfs.blake3_impl";;
 - : string option = Some "Select BLAKE3 implementation."
-#  Sysctl.nametomib "compat" |> Sysctl.iter |> Seq.map Sysctl.name |> Seq.iter print_endline;;
+# Sysctl.nametomib "compat" |> Sysctl.iter |> Seq.map Sysctl.name |> Seq.iter print_endline;;
 compat
 compat.ia32.maxvmem
 compat.ia32.maxssiz
