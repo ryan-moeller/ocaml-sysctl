@@ -1,3 +1,7 @@
+type ctlmib = int array
+
+type ctlfmt = int * string
+
 type ctlval =
   | Node
   | Int of int
@@ -45,14 +49,14 @@ let is_caprw kf = is_caprd kf && is_capwr kf
 let is_stats (kind, _fmt) = kind land 0x00002000 != 0
 let is_nofetch (kind, _fmt) = kind land 0x00001000 != 0
 
-external nametomib : string -> int array = "caml_sysctl_nametomib"
-external next : int array -> int array option = "caml_sysctl_next"
-external next_noskip : int array -> int array option = "caml_sysctl_next_noskip"
-external name : int array -> string = "caml_sysctl_name"
-external format : int array -> int * string = "caml_sysctl_format"
-external description : int array -> string option = "caml_sysctl_description"
-external get : int array -> ctlval = "caml_sysctl_get"
-external set : int array -> ctlval -> unit = "caml_sysctl_set"
+external nametomib : string -> ctlmib = "caml_sysctl_nametomib"
+external next : ctlmib -> ctlmib option = "caml_sysctl_next"
+external next_noskip : ctlmib -> ctlmib option = "caml_sysctl_next_noskip"
+external name : ctlmib -> string = "caml_sysctl_name"
+external format : ctlmib -> ctlfmt = "caml_sysctl_format"
+external description : ctlmib -> string option = "caml_sysctl_description"
+external get : ctlmib -> ctlval = "caml_sysctl_get"
+external set : ctlmib -> ctlval -> unit = "caml_sysctl_set"
 
 let getbyname name =
   let mib = nametomib name in
