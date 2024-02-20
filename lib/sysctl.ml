@@ -62,7 +62,7 @@ let setbyname name value =
   let mib = nametomib name in
   set mib value
 
-let iter mib () =
+let iter mib =
   let prefix_match nxt =
     let len = Array.length mib in
     if len > Array.length nxt then false
@@ -77,7 +77,7 @@ let iter mib () =
         else Seq.Cons (mib, fun () -> Seq.Nil)
     | None -> Seq.Cons (mib, fun () -> Seq.Nil)
   in
-  iter1 mib ()
+  iter1 mib
 
 let all =
   let rec iter1 mib () =
@@ -87,7 +87,7 @@ let all =
   in
   iter1 [| 1 |]
 
-let iter_noskip mib () =
+let iter_noskip mib =
   let prefix_match nxt =
     let len = Array.length mib in
     if len > Array.length nxt then false
@@ -102,7 +102,7 @@ let iter_noskip mib () =
         else Seq.Cons (mib, fun () -> Seq.Nil)
     | None -> Seq.Cons (mib, fun () -> Seq.Nil)
   in
-  iter1 mib ()
+  iter1 mib
 
 let all_noskip =
   let rec iter1 mib () =
