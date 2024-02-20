@@ -1,5 +1,4 @@
 type ctlmib = int array
-
 type ctlfmt = int * string
 
 type ctlval =
@@ -40,7 +39,6 @@ val is_capwr : ctlfmt -> bool
 val is_caprw : ctlfmt -> bool
 val is_stats : ctlfmt -> bool
 val is_nofetch : ctlfmt -> bool
-
 val nametomib : string -> ctlmib
 val next : ctlmib -> ctlmib option
 val next_noskip : ctlmib -> ctlmib option
