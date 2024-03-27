@@ -7,6 +7,7 @@
 #include <caml/memory.h>
 #include <caml/fail.h>
 #include <caml/threads.h>
+#include <caml/unixsupport.h>
 
 #define ctlval_Int_tag		0
 #define ctlval_String_tag	1
@@ -35,10 +36,12 @@ caml_sysctl_nametomib(value name)
 	caml_release_runtime_system();
 	size = nitems(mib);
 	err = sysctlnametomib(String_val(name), mib, &size);
-	caml_acquire_runtime_system();
 	if (err) {
-		caml_failwith(strerror(errno));
+		err = errno;
+		caml_acquire_runtime_system();
+		caml_unix_error(err, "sysctlnametomib", name);
 	}
+	caml_acquire_runtime_system();
 
 	res = caml_alloc(size, 0);
 	for (size_t i = 0; i < size; i++) {
@@ -78,7 +81,7 @@ caml_sysctl_next(value mib)
 		if (err == ENOENT) {
 			CAMLreturn (Val_none);
 		}
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 	len /= sizeof nextoid[0];
 	caml_acquire_runtime_system();
@@ -120,7 +123,7 @@ caml_sysctl_next_noskip(value mib)
 		if (err == ENOENT) {
 			CAMLreturn (Val_none);
 		}
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 	len /= sizeof nextoid[0];
 	caml_acquire_runtime_system();
@@ -159,7 +162,7 @@ caml_sysctl_name(value mib)
 	if (err) {
 		err = errno;
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 	caml_acquire_runtime_system();
 
@@ -196,7 +199,7 @@ caml_sysctl_format(value mib)
 	if (err) {
 		err = errno;
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 
 	kind = *(u_int *)buf;
@@ -241,7 +244,7 @@ caml_sysctl_description(value mib)
 		if (err == ENOENT) {
 			CAMLreturn (Val_none);
 		}
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 
 	descr = (char *)buf;
@@ -282,7 +285,7 @@ caml_sysctl_get(value mib)
 	if (err) {
 		err = errno;
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 
 	kind = *(u_int *)buf;
@@ -298,21 +301,21 @@ caml_sysctl_get(value mib)
 	if (err) {
 		err = errno;
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 	len += len; /* double buffer size to be safe */
 	p = malloc(len);
 	if (p == NULL) {
 		err = errno;
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "malloc", Val_int(len));
 	}
 	err = sysctl(qoid + 2, size, p, &len, NULL, 0);
 	if (err) {
 		err = errno;
 		free(p);
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 
 	caml_acquire_runtime_system();
@@ -411,7 +414,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(int *)p = v;
 		break;
@@ -421,7 +424,7 @@ caml_sysctl_set(value mib, value val)
 		len = strlen(s);
 		p = strdup(s);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("strdup", Field(val, 0));
 		}
 		break;
 	}
@@ -430,7 +433,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(int64_t *)p = v;
 		break;
@@ -440,7 +443,7 @@ caml_sysctl_set(value mib, value val)
 		len = caml_string_length(Field(val, 0));
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		memcpy(p, v, len);
 		break;
@@ -450,7 +453,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(u_int *)p = v;
 		break;
@@ -460,7 +463,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(long *)p = v;
 		break;
@@ -470,7 +473,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(u_long *)p = v;
 		break;
@@ -480,7 +483,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(uint64_t *)p = v;
 		break;
@@ -490,7 +493,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(uint8_t *)p = v;
 		break;
@@ -500,7 +503,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(uint16_t *)p = v;
 		break;
@@ -510,7 +513,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(int8_t *)p = v;
 		break;
@@ -520,7 +523,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(int16_t *)p = v;
 		break;
@@ -530,7 +533,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(int32_t *)p = v;
 		break;
@@ -540,7 +543,7 @@ caml_sysctl_set(value mib, value val)
 		len = sizeof v;
 		p = malloc(len);
 		if (p == NULL) {
-			caml_failwith(strerror(errno));
+			caml_uerror("malloc", Val_int(len));
 		}
 		*(uint32_t *)p = v;
 		break;
@@ -555,7 +558,7 @@ caml_sysctl_set(value mib, value val)
 		err = errno;
 		free(p);
 		caml_acquire_runtime_system();
-		caml_failwith(strerror(err));
+		caml_unix_error(err, "sysctl", mib);
 	}
 	free(p);
 	caml_acquire_runtime_system();
