@@ -9,6 +9,7 @@
 #include <caml/threads.h>
 #include <caml/unixsupport.h>
 
+#define ctlval_Node		Val_int(0)
 #define ctlval_Int_tag		0
 #define ctlval_String_tag	1
 #define ctlval_S64_tag		2
@@ -292,8 +293,7 @@ caml_sysctl_get(value mib)
 	ctltype = kind & CTLTYPE;
 	if (ctltype == CTLTYPE_NODE) {
 		caml_acquire_runtime_system();
-		res = Val_int(0); /* first constant constructor */
-		CAMLreturn (res);
+		CAMLreturn (ctlval_Node);
 	}
 
 	len = 0;
@@ -399,15 +399,14 @@ caml_sysctl_set(value mib, value val)
 	if (size > CTL_MAXNAME) {
 		caml_invalid_argument("Invalid mib: too long");
 	}
+	if (val == ctlval_Node) {
+		caml_invalid_argument("Invalid val: can't set to Node");
+	}
 
 	for (mlsize_t i = 0; i < size; i++) {
 		oid[i] = Int_val(Field(mib, i));
 	}
 
-	/* Do nothing for ctlval Node values. */
-	if (val == Int_val(0)) {
-		CAMLreturn (Val_unit);
-	}
 	switch (Tag_val(val)) {
 	case ctlval_Int_tag: {
 		int v = Int_val(Field(val, 0));
