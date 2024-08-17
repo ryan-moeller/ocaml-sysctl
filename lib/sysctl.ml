@@ -77,8 +77,8 @@ let iter mib =
     match next mib with
     | Some nxt ->
         if prefix_match nxt then Seq.Cons (mib, iter1 nxt)
-        else Seq.Cons (mib, fun () -> Seq.Nil)
-    | None -> Seq.Cons (mib, fun () -> Seq.Nil)
+        else Seq.Cons (mib, Seq.empty)
+    | None -> Seq.Cons (mib, Seq.empty)
   in
   iter1 mib
 
@@ -86,7 +86,7 @@ let all =
   let rec iter1 mib () =
     match next mib with
     | Some nxt -> Seq.Cons (mib, iter1 nxt)
-    | None -> Seq.Cons (mib, fun () -> Seq.Nil)
+    | None -> Seq.Cons (mib, Seq.empty)
   in
   iter1 [| 1 |]
 
@@ -102,8 +102,8 @@ let iter_noskip mib =
     match next_noskip mib with
     | Some nxt ->
         if prefix_match nxt then Seq.Cons (mib, iter1 nxt)
-        else Seq.Cons (mib, fun () -> Seq.Nil)
-    | None -> Seq.Cons (mib, fun () -> Seq.Nil)
+        else Seq.Cons (mib, Seq.empty)
+    | None -> Seq.Cons (mib, Seq.empty)
   in
   iter1 mib
 
@@ -111,6 +111,6 @@ let all_noskip =
   let rec iter1 mib () =
     match next_noskip mib with
     | Some nxt -> Seq.Cons (mib, iter1 nxt)
-    | None -> Seq.Cons (mib, fun () -> Seq.Nil)
+    | None -> Seq.Cons (mib, Seq.empty)
   in
   iter1 [| 1 |]
