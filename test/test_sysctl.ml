@@ -11,10 +11,12 @@ let () =
          Printf.printf "%s [%s]: %s\n" name fmt desc)
 
 let () =
-  Sysctl.nametomib "vfs.zfs"
-  |> Sysctl.iter
+  Sysctl.nametomib "vfs.zfs" |> Sysctl.iter
   |> Seq.map (fun mib ->
-         (Sysctl.name mib, Sysctl.format mib, Sysctl.description mib, Sysctl.get mib))
+         ( Sysctl.name mib,
+           Sysctl.format mib,
+           Sysctl.description mib,
+           Sysctl.get mib ))
   |> Seq.map (fun (name, (_kind, fmt), desc, value) ->
          let v = Sysctl.string_of_ctlval value in
          match desc with
@@ -25,4 +27,5 @@ let () =
 
 let () = Sysctl.all |> Seq.length |> Printf.printf "all: %d mibs\n"
 
-let () = Sysctl.all_noskip |> Seq.length |> Printf.printf "all_noskip: %d mibs\n"
+let () =
+  Sysctl.all_noskip |> Seq.length |> Printf.printf "all_noskip: %d mibs\n"
