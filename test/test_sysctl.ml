@@ -1,5 +1,5 @@
 let () =
-  Sysctl.nametomib "kstat.zfs"
+  Sysctl.nametomib "vm"
   |> Sysctl.iter_noskip
   |> Seq.map (fun mib ->
          (Sysctl.name mib, Sysctl.format mib, Sysctl.description mib))
@@ -11,7 +11,7 @@ let () =
          Printf.printf "%s [%s]: %s\n" name fmt desc)
 
 let () =
-  Sysctl.nametomib "vfs.zfs" |> Sysctl.iter
+  Sysctl.nametomib "vm" |> Sysctl.iter
   |> Seq.map (fun mib ->
          ( Sysctl.name mib,
            Sysctl.format mib,
