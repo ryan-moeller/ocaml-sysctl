@@ -26,7 +26,23 @@ Sysctl.String "fastest scalar superscalar superscalar4 sse2 ssse3 [avx2] "
 # Sysctl.description @@ Sysctl.nametomib "vfs.zfs.blake3_impl";;
 - : string option = Some "Select BLAKE3 implementation."
 # Sysctl.nametomib "compat" |> Sysctl.iter |> Seq.map Sysctl.name |> Seq.iter print_endline;;
-compat
+compat.linux32.emulate_i386
+compat.linux32.maxvmem
+compat.linux32.maxssiz
+compat.linux32.maxdsiz
+compat.linux.use_real_ifnames
+compat.linux.emul_path
+compat.linux.oss_version
+compat.linux.osrelease
+compat.linux.osname
+compat.linux.setid_allowed
+compat.linux.map_sched_prio
+compat.linux.preserve_vstatus
+compat.linux.ignore_ip_recverr
+compat.linux.dummy_rlimits
+compat.linux.default_stacksize
+compat.linux.default_openfiles
+compat.linux.debug
 compat.ia32.maxvmem
 compat.ia32.maxssiz
 compat.ia32.maxdsiz
@@ -35,8 +51,13 @@ compat.linuxkpi.lkpi_pci_nseg1_fail
 compat.linuxkpi.task_struct_reserve
 compat.linuxkpi.net_ratelimit
 compat.linuxkpi.warn_dump_stack
+compat.linuxkpi.rcu_debug
 compat.linuxkpi.debug
+compat.linuxkpi.80211.debug
+compat.linuxkpi.80211.tkip
+compat.linuxkpi.80211.hw_crypto
+compat.linuxkpi.80211.order_scanlist
 - : unit = ()
 # Sysctl.all_noskip |> Seq.length;;
-- : int = 20083
+- : int = 20977
 ```

@@ -75,8 +75,8 @@ let iter mib =
   in
   let rec iter1 mib () =
     match next mib with
-    | Some nxt when prefix_match nxt -> Seq.Cons (mib, iter1 nxt)
-    | _ -> Seq.Cons (mib, Seq.empty)
+    | Some nxt when prefix_match nxt -> Seq.Cons (nxt, iter1 nxt)
+    | _ -> Seq.Nil
   in
   iter1 mib
 
@@ -98,8 +98,8 @@ let iter_noskip mib =
   in
   let rec iter1 mib () =
     match next_noskip mib with
-    | Some nxt when prefix_match nxt -> Seq.Cons (mib, iter1 nxt)
-    | _ -> Seq.Cons (mib, Seq.empty)
+    | Some nxt when prefix_match nxt -> Seq.Cons (nxt, iter1 nxt)
+    | _ -> Seq.Nil
   in
   iter1 mib
 
