@@ -4,10 +4,9 @@ synopsis: "Bindings for FreeBSD sysctl(3) functions"
 description: "Functions to get and set FreeBSD sysctls"
 maintainer: ["Ryan Moeller"]
 authors: ["Ryan Moeller"]
-license: "LICENSE"
+license: "BSD-2-Clause"
 tags: ["topics" "FreeBSD" "sysctl"]
 homepage: "https://github.com/ryan-moeller/ocaml-sysctl"
-doc: "https://url/to/documentation"
 bug-reports: "https://github.com/ryan-moeller/ocaml-sysctl/issues"
 depends: [
   "ocaml"
