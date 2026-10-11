@@ -1,6 +1,8 @@
 OCaml Bindings for FreeBSD sysctl(3)
 ====================================
 
+[![FreeBSD 15.1](https://github.com/ryan-moeller/ocaml-sysctl/workflows/FreeBSD%2015.1/badge.svg)](https://github.com/ryan-moeller/ocaml-sysctl/actions/workflows/test.yml)
+
 Usage
 -----
 
